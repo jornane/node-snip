@@ -2,8 +2,10 @@ var sni = require('sni');
 var net = require('net');
 var dns = require('dns');
 
-var port = process.env.PORT;
-if (!port) port = 443;
+var port = process.env.PORT || 443;
+if (process.env.DNS) {
+	dns.setServers(process.env.DNS.split(','));
+}
 
 function initSession(serverSocket, hostname) {
 	dns.resolve6(hostname, function (err, addresses) {
