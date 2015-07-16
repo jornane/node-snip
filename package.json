@@ -1,0 +1,29 @@
+{
+	"name": "node-snip",
+	"version": "1.0.0",
+	"description": "SNI Proxy",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/jornane/node-snip.git"
+	},
+	"keywords": [
+		"https",
+		"sni",
+		"proxy"
+	],
+	"dependencies": {
+		"native-dns": "~0.4.1",
+		"net": "~1.0.2",
+		"sni": "~0.0.1"
+	},
+	"author": "Jørn Åne <git@jornane.no>",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/jornane/node-snip/issues"
+	},
+	"homepage": "https://github.com/jornane/node-snip#readme"
+}
