@@ -6,6 +6,7 @@ var port = process.env.PORT || 443;
 if (process.env.DNS) {
 	dns.setServers(process.env.DNS.split(','));
 }
+var shutdownGrace = process.env.SHUTDOWN_GRACE || 5000;
 
 function initSession(serverSocket, hostname) {
 	dns.resolve6(hostname, function (err, addresses) {
@@ -22,10 +23,24 @@ function initSession(serverSocket, hostname) {
 	});
 }
 
-net.createServer(function (socket) {
+function interrupt() {
+	server.close();
+	server.getConnections(function (err, count) {
+		if (!err && count) {
+			console.error('Received interrupt signal.');
+			setTimeout(function() {
+				process.exit()
+			}, shutdownGrace)
+		}
+	});
+}
+
+server = net.createServer(function (socket) {
 	socket.once('data', function (data) {
 		socket.pause();
 		socket.unshift(data);
 		initSession(socket, sni(data));
 	});
 }).listen(port, '0.0.0.0');
+
+process.once('SIGINT', interrupt);
