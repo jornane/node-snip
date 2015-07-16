@@ -2,7 +2,7 @@
 	"name": "node-snip",
 	"version": "1.0.0",
 	"description": "SNI Proxy",
-	"main": "index.js",
+	"main": "snip.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},

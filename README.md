@@ -102,7 +102,7 @@ Testing
 
 Running a test proxy is easy! First start the proxy on an unprivileged port.
 ```sh
-PORT=2443 node index.js
+PORT=2443 node snip.js
 ```
 
 In another shell, on the same machine, run:
