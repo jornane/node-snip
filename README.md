@@ -19,19 +19,19 @@ ready for a future where there will be IPv6-only clients.  This, however, poses
 a challenge; since IPv4 addresses are scarce, the assignment of these must be
 planned carefully.
 
-A popular solution to this problem today is the use of only RFC1918 address
-space in server networks (no IPv6 connectivity), with a proxy on the network
-edge that makes all servers available via both IPv4 and IPv6.  Using these
-IPv4-only backend networks requires the proxy to have knowledge of all hosts
-that reside behind it, and generally requires a management infrastructure to
-keep track of everything.
+A popular solution to this problem today is to exclusively use RFC1918
+addresses space for backend services (no IPv6 connectivity).  A proxy server on
+the network edge exposes all backend services via both IPv4 and IPv6.  Using
+these IPv4-only backend networks requires that the proxy has knowledge of all
+services that reside behind it, and generally requires a configuration
+management infrastructure to keep track of everything.
 
 This project seeks to provide an alternative solution to the problem.  In this
 solution, the backend network is IPv6-only without private addresses.  One or
-multiple proxies are assigned IPv4 addresses.  IPv6 users will bypass the proxy
-entirely and address the backend server directly.  IPv4 users will connect to
-the proxy and have their HTTPS connections forwarded to the backend server.
-The proxy requires no configuration and is designed for
+multiple proxies are assigned public IPv4 addresses.  IPv6-capable clients will
+bypass the proxy entirely and address the backend server directly.  IPv4-only
+clients will connect to the proxy and have their HTTPS connections forwarded to
+the backend server.  The proxy requires no configuration and is designed to
 "*configure and forget*".
 
 
@@ -51,17 +51,17 @@ and forward it to another IP address based on the SNI value.
 
 The advantage is that one IPv4 address can serve many virtual hosts without any
 configuration being necessary on the proxy.  Configuration is simply done in
-DNS, which is already being done in virtually any setup.  The listens on TCP4
-port 443, sniffs the SNI value and looks up the hostname's AAAA record.  It then
-establishes a TCP connection to this host on TCP6 port 443.  When a hostname is
-added, removed or modified, the changes in DNS will automatically change the
-behaviour in the proxy.
+DNS, which is already being done in virtually any setup.  The proxy listens on
+TCP4 port 443, sniffs the SNI value and looks up the hostname's AAAA record.
+It then establishes a connection to this host on TCP6 port 443.  When any
+hostname is added, removed or modified, the changes in DNS will automatically
+change the behaviour in the proxy.
 
 Since the proxy functions as a TCP proxy with an IPv4 client and an IPv6 server,
 the proxy must be configured with dual stack.  However, any backend server can
-be configured IPv6-only, using NAT64 or with IPv4 behind NAT.  This greatly
-reduces the amount of required IPv4 addresses in a network and thus greatly
-reduces the amount of resource planning required.
+be configured IPv6-only or with NAT64 or with IPv4 behind NAT.  This greatly
+reduces the amount of required IPv4 addresses in the network and therefore
+greatly reduces the amount of resource planning required.
 
 
 DNS Configuration
