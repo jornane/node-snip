@@ -14,8 +14,10 @@ The news that IPv4 addresses are running out and that everyone should switch to
 IPv6 has been around for decades.  However, there are still many end-hosts
 without IPv6 connectivity, while end-hosts without IPv4 connectivity are still
 scarce.  Todays best practice is therefore to run servers dual-stack, giving
-them both IPv4 and IPv6 addresses.  This, however, poses a challenge; since
-IPv4 addresses are scarce, the assignment of these addresses must be planned.
+them both IPv4 and IPv6 addresses, supporting IPv4-only clients while being
+ready for a future where there will be IPv6-only clients.  This, however, poses
+a challenge; since IPv4 addresses are scarce, the assignment of these must be
+planned carefully.
 
 A popular solution to this problem today is the use of only RFC1918 address
 space in server networks (no IPv6 connectivity), with a proxy on the network
