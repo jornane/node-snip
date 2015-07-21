@@ -4,7 +4,7 @@ SNI Proxy
 The SNI Proxy, **snip** for short, is a simple TCP proxy that listens for
 incoming HTTPS connections on IPv4, reads the SNI value (hostname) and proxies
 the TCP connection to an IPv6 host with that hostname.  It does so without
-applying any cryptography.
+applying any cryptography, keeping end-to-end encryption intact.
 
 
 Motivation
