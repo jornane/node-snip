@@ -18,7 +18,7 @@
 	"dependencies": {
 		"native-dns": "~0.4.1",
 		"net": "~1.0.2",
-		"sni": "~0.0.1"
+		"sni": "git://github.com/jornane/sni#binparser"
 	},
 	"author": "Jørn Åne <git@jornane.no>",
 	"license": "ISC",
