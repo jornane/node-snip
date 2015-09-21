@@ -18,7 +18,7 @@ function initSession(serverSocket, sniName) {
 		ip = addresses[0];
 		clientSocket = new net.Socket({ type: 'tcp6' });
 		clientSocket.connect(443, ip, function () {
-			serverSocket.pipe(clientSocket).pipe(serverSocket).resume();
+			serverSocket.pipe(clientSocket).pipe(serverSocket);
 		});
 	});
 }
