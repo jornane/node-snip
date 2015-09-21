@@ -1,6 +1,6 @@
 {
 	"name": "node-snip",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "SNI Proxy",
 	"main": "snip.js",
 	"scripts": {
@@ -18,7 +18,7 @@
 	"dependencies": {
 		"native-dns": "~0.4.1",
 		"net": "~1.0.2",
-		"sni": "~0.0.1"
+		"sni-reader": "git://github.com/tellnes/sni-reader#master"
 	},
 	"author": "Jørn Åne <git@jornane.no>",
 	"license": "ISC",
