@@ -8,11 +8,15 @@ if (process.env.DNS) {
 }
 var shutdownGrace = process.env.SHUTDOWN_GRACE || 5000;
 
-function initSession(serverSocket, hostname) {
-	dns.resolve6(hostname, function (err, addresses) {
+function initSession(serverSocket, sniName) {
+	if (!sniName || sniName.length == 0) {
+		serverSocket.end();
+		return;
+	}
+	dns.resolve6(sniName, function (err, addresses) {
 		if (!addresses || !addresses.length) {
 			serverSocket.end();
-			console.log('Unable to resolve AAAA ' + hostname);
+			console.log('Unable to resolve AAAA ' + sniName);
 			return;
 		}
 		ip = addresses[0];
