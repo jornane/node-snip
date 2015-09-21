@@ -9,6 +9,10 @@ if (process.env.DNS) {
 var shutdownGrace = process.env.SHUTDOWN_GRACE || 5000;
 
 function initSession(serverSocket, sniName) {
+	if (!sniName || sniName.length == 0) {
+		serverSocket.end();
+		return;
+	}
 	dns.resolve6(sniName, function (err, addresses) {
 		if (!addresses || !addresses.length) {
 			serverSocket.end();
