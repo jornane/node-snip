@@ -15,36 +15,47 @@ var dnsCache = new AsyncCache({
 	max: 1000,
 	maxAge: process.env.DNS_CACHE || 3600 * 1000,
 	load: function (key, cb) {
+		log.verbose('dns', 'Looking up AAAA', key);
 		dns.resolve6(key, cb);
 	}
 });
 
 function initSession(serverSocket, sniName) {
 	dnsCache.get(sniName, function (err, addresses) {
-		if (!addresses || !addresses.length) {
+		if (err) {
 			serverSocket.end();
-			log.warn(serverSocket.remoteAddress, 'sni', sniName, 'resolve', err ? err.code : null);
+			log.warn('dns', serverSocket.remoteAddress, sniName, 'resolve', err ? err.code : null);
 			return;
 		}
 		var ip = addresses[0];
 		var clientSocket = net.connect({port: 443, type: 'tcp6', host: ip});
-		log.verbose(serverSocket.remoteAddress, 'sni', sniName, 'resolved', addresses);
+		log.silly('tcp', serverSocket.remoteAddress, sniName, 'connecting', addresses);
 
 		clientSocket.on('connect', function () {
 			serverSocket.pipe(clientSocket).pipe(serverSocket);
-			log.info(serverSocket.remoteAddress, 'sni', sniName, 'proxied', ip);
+			log.info('tcp', serverSocket.remoteAddress, sniName, 'connected', ip);
 		});
 	});
 }
 
 var server = net.createServer(function (serverSocket) {
+	serverSocket.on('error', function(err){
+		if (err.code == 'EPIPE') {
+			log.verbose('sni', serverSocket.remoteAddress, 'disconnected before pipe opened');
+		} else {
+			log.error('sni', err);
+		}
+		serverSocket.end();
+	});
 	sni(serverSocket, function(err, sniName) {
-		if (err) throw err;
-		if (sniName) {
-			log.verbose(serverSocket.remoteAddress, 'sni', sniName);
+		if (err) {
+			log.error(err);
+			serverSocket.end();
+		} else if (sniName) {
+			log.verbose('sni', serverSocket.remoteAddress, sniName);
 			initSession(serverSocket, sniName);
 		} else {
-			log.warn(serverSocket.remoteAddress, 'sni', '(none)');
+			log.warn('sni', serverSocket.remoteAddress, '(none)');
 			serverSocket.end();
 		}
 	});
@@ -60,7 +71,8 @@ function interrupt() {
 				process.exit();
 			}, shutdownGrace);
 		} else if (err) {
-			console.error('Error while receiving interrupt! Attempt to bail, no grace.', err);
+			log.error(err);
+			console.error('Error while receiving interrupt! Attempt to bail, no grace.');
 			process.exit();
 		}
 	});
