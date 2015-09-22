@@ -16,8 +16,9 @@
 		"proxy"
 	],
 	"dependencies": {
-		"native-dns": "~0.4.1",
+		"async-cache": "~1",
 		"net": "~1.0.2",
+		"npmlog": "^1.2.1",
 		"sni-reader": "git://github.com/tellnes/sni-reader#master"
 	},
 	"author": "Jørn Åne <git@jornane.no>",
