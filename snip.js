@@ -41,7 +41,7 @@ function initSession(serverSocket, sniName) {
 var server = net.createServer(function (serverSocket) {
 	serverSocket.on('error', function(err){
 		if (err.code == 'EPIPE') {
-			log.verbose('sni', serverSocket.remoteAddress, 'disconnected before pipe opened');
+			log.verbose('sni', serverSocket.remoteAddress, 'Client disconnected before the pipe was connected.');
 		} else {
 			log.error('sni', err);
 		}
@@ -49,7 +49,7 @@ var server = net.createServer(function (serverSocket) {
 	});
 	sni(serverSocket, function(err, sniName) {
 		if (err) {
-			log.error(err);
+			log.error('sni', err.stack);
 			serverSocket.end();
 		} else if (sniName) {
 			log.verbose('sni', serverSocket.remoteAddress, sniName);
@@ -71,8 +71,7 @@ function interrupt() {
 				process.exit();
 			}, shutdownGrace);
 		} else if (err) {
-			log.error(err);
-			console.error('Error while receiving interrupt! Attempt to bail, no grace.');
+			console.error('Error while receiving interrupt! Attempt to bail, no grace.', err);
 			process.exit();
 		}
 	});
