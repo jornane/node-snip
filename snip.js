@@ -36,38 +36,21 @@ function initSession(serverSocket, sniName) {
 		var clientSocket = net.connect({port: 443, type: 'tcp6', host: ip});
 		tcpLog.debug(serverSocket.remoteAddress, sniName, 'connecting', addresses);
 
-		clientSocket.on('connect', function () {
+		clientSocket.on('connect', function() {
 			serverSocket.pipe(clientSocket).pipe(serverSocket);
 			tcpLog.info(serverSocket.remoteAddress, sniName, 'connected', ip);
 		});
-	});
-}
-
-var server = net.createServer(function (serverSocket) {
-	serverSocket.on('error', function(err){
-		if (err.code == 'EPIPE') {
-			sniLog.debug(serverSocket.remoteAddress, 'Client disconnected before the pipe was connected.');
-		} else {
-			sniLog.fatal(err);
-		}
-		serverSocket.end();
-	});
-	sni(serverSocket, function(err, sniName) {
-		if (err) {
-			sniLog.trace(err);
+		clientSocket.on('error', function(err) {
+			tcpLog.error(sniName, 'Client socket reported', err.code);
 			serverSocket.end();
-		} else if (sniName) {
-			sniLog.debug(serverSocket.remoteAddress, sniName);
-			initSession(serverSocket, sniName);
-		} else {
-			sniLog.warn(serverSocket.remoteAddress, '(none)');
-			serverSocket.end();
-		}
+		})
+		serverSocket.on('error', function(err) {
+			tcpLog.error(serverSocket.remoteAddress, 'Server socket reported', err.code);
+			clientSocket.end();
+		})
 	});
-}).listen(port, '0.0.0.0');
-tcpLog.debug('Started listening on tcp4 port ', port);
+};
 
-process.once('SIGINT', interrupt);
 function interrupt() {
 	server.close();
 	server.getConnections(function (err, count) {
@@ -81,4 +64,30 @@ function interrupt() {
 			process.exit();
 		}
 	});
-}
+};
+
+var server = net.createServer(function (serverSocket) {
+	sni(serverSocket, function(err, sniName) {
+		if (err) {
+			sniLog.trace(err);
+			serverSocket.end();
+		} else if (sniName) {
+			sniLog.debug(serverSocket.remoteAddress, sniName);
+			serverSocket.on('error', function(err){
+				if (err.code == 'EPIPE') {
+					sniLog.debug(serverSocket.remoteAddress, 'Client disconnected before the pipe was connected.');
+				} else {
+					sniLog.fatal(err);
+				}
+				serverSocket.end();
+			});
+			initSession(serverSocket, sniName);
+		} else {
+			sniLog.warn(serverSocket.remoteAddress, '(none)');
+			serverSocket.end();
+		}
+	});
+}).listen(port, '0.0.0.0');
+tcpLog.debug('Started listening on tcp4 port', port);
+
+process.once('SIGINT', interrupt);
